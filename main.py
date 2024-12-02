@@ -147,9 +147,7 @@ def fetch_links_from_acc(list_acc_check, list_user):
         }
         cursor_bottom = None
         time_scroll = 0
-        while True:
-            if time_scroll >= maximum_scroll:
-                break
+        while time_scroll < maximum_scroll:
             time_scroll += 1
             headers = {
                 "Content-Type": "application/json",
@@ -189,12 +187,13 @@ def fetch_links_from_acc(list_acc_check, list_user):
                         if total_hours < period_time:
                             favorite_count = entry["content"]["itemContent"]["tweet_results"]['result']['legacy']['favorite_count']
                             if favorite_count >= min_favorite:
-                                url_clean = convert_twitter_to_x(image_url)         
-                                parts = url_clean.split("/")
-                                links.append(url_clean)
-                                write_to_file(name_file_acc_st_has_favorite,url_clean)
-                                print(f"User: {parts[3]} có seacrh top  - {favorite_count} tim - {url_clean}")
-                                break
+                                url_clean = convert_twitter_to_x(image_url)
+                                if url_clean not in links:
+                                    links.append(url_clean)
+                                    write_to_file(name_file_acc_st_has_favorite,url_clean)
+                                    print(f"User: {parts[3]} có seacrh top  - {favorite_count} tim - {url_clean}")
+                                    time_scroll = maximum_scroll
+                                    break
                 try:
                     cursor_bottom = find_objects_with_cursor(response.json())[0]["value"]
                 except:
