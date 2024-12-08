@@ -237,10 +237,9 @@ with open('user.txt', 'r') as file:
 
 threads = []
 
+number_acc_check_per_thread = len(list_acc_check) // number_of_threads
+number_user_per_thread = len(list_user) // number_of_threads
 for i in range(number_of_threads):
-    number_acc_check_per_thread = len(list_acc_check) // number_of_threads
-    number_user_per_thread = len(list_user) // number_of_threads
-
     start_acc_check = i * number_acc_check_per_thread
     end_acc_check = start_acc_check + number_acc_check_per_thread
     start_user = i * number_user_per_thread
@@ -255,6 +254,3 @@ for i in range(number_of_threads):
 
 for thread in threads:
     thread.start()
-
-
-fetch_links_from_acc(list_acc_check, list_user, use_proxy = False)
