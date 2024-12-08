@@ -19,6 +19,14 @@ def write_to_file(filename, content):
         with open(filename, 'a') as file:  # Mở file ở chế độ 'a' để ghi thêm vào file
             file.write(content + '\n')
 
+def delete_acc_check(acc_check):
+    with lock:
+        with open('acc_check.json', 'r') as file:
+            data = json.load(file)
+            data.remove(acc_check)
+        with open('acc_check.json', 'w') as file:
+            json.dump(data, file, indent=4)
+
 # đọc file yml và gán vào các setting trên
 def load_settings_from_yml(file_path):
     global period_time, min_favorite, name_file_acc_st_has_favorite, time_sleep, maximum_scroll, number_of_threads
@@ -92,8 +100,6 @@ def fetch_links_from_acc(list_acc_check, list_user, use_proxy = False):
         print(f"Đang kiểm tra {user}...")
 
         acc_check = list_acc_check[i]
-        print(f"Đang sử dụng tài khoản thứ {i + 1} để check...")
-        
         if use_proxy:
             raw_proxy = random.choice(list_proxy)
             proxy_parts = raw_proxy.split(':')
@@ -173,8 +179,9 @@ def fetch_links_from_acc(list_acc_check, list_user, use_proxy = False):
                 try:
                     data["data"]["search_by_raw_query"]["search_timeline"]["timeline"]["instructions"][0]["entries"]
                 except:
-                    print(f"Lỗi ck tại acc thứ {i}, đang chuyển sang acc khác...")
+                    print(f"Lỗi ck, đang chuyển sang acc khác...")
                     list_acc_check.remove(acc_check)
+                    delete_acc_check(acc_check)
                     # chọn ngẫu nhiên 1 acc khác
                     acc_check = random.choice(list_acc_check)
                     print(f"Đang sử dụng tài khoản ngẫu nhiên để check...")
@@ -186,7 +193,6 @@ def fetch_links_from_acc(list_acc_check, list_user, use_proxy = False):
                         # nếu như post ko ảnh thì bỏ qua
                         continue
                     created_at = entry["content"]["itemContent"]["tweet_results"]['result']['legacy']['created_at']
-                    print("created_at: ", created_at)
                     total_hours = calculate_time_difference(created_at)
 
                     parts = image_url.split("/")
@@ -208,7 +214,9 @@ def fetch_links_from_acc(list_acc_check, list_user, use_proxy = False):
                     break
                 time.sleep(time_sleep)
             else:
-                print(f"Lỗi ck tại acc thứ {i}, đang chuyển sang acc khác...")
+                print(f"Lỗi ck, đang chuyển sang acc khác...")
+                # xóa acc đang lỗi khỏi file acc_check.json
+                delete_acc_check(acc_check)
                 list_acc_check.remove(acc_check)
                 # chọn ngẫu nhiên 1 acc khác
                 acc_check = random.choice(list_acc_check)
