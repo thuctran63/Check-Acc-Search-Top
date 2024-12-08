@@ -74,7 +74,7 @@ def convert_twitter_to_x(url):
     
 
 
-def fetch_links_from_acc(list_acc_check, list_user):
+def fetch_links_from_acc(list_acc_check, list_user, use_proxy = False):
 
     global period_time, flag, min_favorite, max_favorite, name_file_acc_st_has_favorite, time_sleep, maximum_scroll
     
@@ -82,8 +82,9 @@ def fetch_links_from_acc(list_acc_check, list_user):
     i = 0
     list_proxy = []
 
-    with open('list_proxy.txt', 'r') as file:
-        list_proxy = file.read().splitlines()
+    if use_proxy:
+        with open('list_proxy.txt', 'r') as file:
+            list_proxy = file.read().splitlines()
 
     for user in list_user:
         print(f"Đang kiểm tra {user}...")
@@ -91,14 +92,15 @@ def fetch_links_from_acc(list_acc_check, list_user):
         acc_check = list_acc_check[i]
         print(f"Đang sử dụng tài khoản thứ {i + 1} để check...")
         
-        raw_proxy = random.choice(list_proxy)
-        proxy_parts = raw_proxy.split(':')
-        proxy = f"http://{proxy_parts[2]}:{proxy_parts[3]}@{proxy_parts[0]}:{proxy_parts[1]}"
+        if use_proxy:
+            raw_proxy = random.choice(list_proxy)
+            proxy_parts = raw_proxy.split(':')
+            proxy = f"http://{proxy_parts[2]}:{proxy_parts[3]}@{proxy_parts[0]}:{proxy_parts[1]}"
 
-        proxies = {
-            "http": proxy,
-            "https": proxy
-        }
+            proxies = {
+                "http": proxy,
+                "https": proxy
+            }
 
         # URL endpoint
         url = "https://x.com/i/api/graphql/UN1i3zUiCWa-6r-Uaho4fw/SearchTimeline"
@@ -158,7 +160,10 @@ def fetch_links_from_acc(list_acc_check, list_user):
             if(cursor_bottom != None):
                 params["cursor"] = cursor_bottom
             # Gửi request
-            response = requests.get(url, headers=headers, params=params, proxies=proxies)
+            if use_proxy:
+                response = requests.get(url, headers=headers, params=params, proxies=proxies)
+            else:
+                response = requests.get(url, headers=headers, params=params)
             
             # Kiểm tra xem request có thành công không
             if response.status_code == 200:
@@ -228,4 +233,4 @@ with open('acc_check.json', 'r') as file:
 with open('user.txt', 'r') as file:
     list_user = file.read().splitlines()
 
-fetch_links_from_acc(list_acc_check, list_user)
+fetch_links_from_acc(list_acc_check, list_user, use_proxy = False)
