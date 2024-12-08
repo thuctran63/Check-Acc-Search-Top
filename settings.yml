@@ -2,6 +2,6 @@ setting:
   period_time: 24 # khoảng thời gian (giờ) tối đa kể từ đăng lần test so với thời điểm hiện tại   # 
   min_favorite: 0 # số lượt tim tối thiểu hợp lệ để xem là acc st ( bỏ qua nếu is_check_st = False)
   name_file_acc_st_has_favorite: "links_has_favorite.txt" # tên file chứa link acc đã lên top và có số lượt tim hợp lệ
-  number_of_threads: 1 # số luồng chạy đồng thời
+  number_of_threads: 3 # số luồng chạy đồng thời
   time_sleep: 3 #thời gian ngủ mỗi lần 1 acc check xong
   maximum_scroll: 2 # số lần cuộn trang

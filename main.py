@@ -12,6 +12,7 @@ name_file_acc_st_has_favorite = ""
 time_sleep = 0
 lock = threading.Lock()
 maximum_scroll = 3
+number_of_threads = 3
 
 def write_to_file(filename, content):
     with lock:
@@ -20,7 +21,7 @@ def write_to_file(filename, content):
 
 # đọc file yml và gán vào các setting trên
 def load_settings_from_yml(file_path):
-    global period_time, min_favorite, name_file_acc_st_has_favorite, time_sleep, maximum_scroll
+    global period_time, min_favorite, name_file_acc_st_has_favorite, time_sleep, maximum_scroll, number_of_threads
     with open(file_path, 'r', encoding='utf-8') as file:
         settings = yaml.safe_load(file)
 
@@ -33,6 +34,7 @@ def load_settings_from_yml(file_path):
         name_file_acc_st_has_favorite = setting.get('name_file_acc_st_has_favorite')
         time_sleep = setting.get('time_sleep')
         maximum_scroll = setting.get('maximum_scroll')
+        number_of_threads = setting.get('number_of_threads')
 
 def find_objects_with_cursor(data, target_key = "cursorType", target_value = "Bottom"):
     results = []
@@ -204,7 +206,7 @@ def fetch_links_from_acc(list_acc_check, list_user, use_proxy = False):
                 except:
                     # nếu như không còn cursor thì break
                     break
-                time.sleep(3)
+                time.sleep(time_sleep)
             else:
                 print(f"Lỗi ck tại acc thứ {i}, đang chuyển sang acc khác...")
                 list_acc_check.remove(acc_check)
@@ -232,5 +234,27 @@ with open('acc_check.json', 'r') as file:
 
 with open('user.txt', 'r') as file:
     list_user = file.read().splitlines()
+
+threads = []
+
+for i in range(number_of_threads):
+    number_acc_check_per_thread = len(list_acc_check) // number_of_threads
+    number_user_per_thread = len(list_user) // number_of_threads
+
+    start_acc_check = i * number_acc_check_per_thread
+    end_acc_check = start_acc_check + number_acc_check_per_thread
+    start_user = i * number_user_per_thread
+    end_user = start_user + number_user_per_thread
+
+    if i == number_of_threads - 1:
+        end_acc_check = len(list_acc_check)
+        end_user = len(list_user)
+    
+    thread = threading.Thread(target=fetch_links_from_acc, args=(list_acc_check[start_acc_check:end_acc_check], list_user[start_user:end_user], False))
+    threads.append(thread)
+
+for thread in threads:
+    thread.start()
+
 
 fetch_links_from_acc(list_acc_check, list_user, use_proxy = False)
