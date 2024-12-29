@@ -13,6 +13,8 @@ time_sleep = 0
 lock = threading.Lock()
 maximum_scroll = 3
 number_of_threads = 3
+number_of_links = 0
+source_from_wall = False
 
 def write_to_file(filename, content):
     with lock:
@@ -29,7 +31,7 @@ def delete_acc_check(acc_check):
 
 # đọc file yml và gán vào các setting trên
 def load_settings_from_yml(file_path):
-    global period_time, min_favorite, name_file_acc_st_has_favorite, time_sleep, maximum_scroll, number_of_threads
+    global period_time, min_favorite, name_file_acc_st_has_favorite, time_sleep, maximum_scroll, number_of_threads, number_of_links, source_from_wall
     with open(file_path, 'r', encoding='utf-8') as file:
         settings = yaml.safe_load(file)
 
@@ -43,6 +45,8 @@ def load_settings_from_yml(file_path):
         time_sleep = setting.get('time_sleep')
         maximum_scroll = setting.get('maximum_scroll')
         number_of_threads = setting.get('number_of_threads')
+        number_of_links = setting.get('number_of_links')
+        source_from_wall = setting.get('source_from_wall')
 
 def find_objects_with_cursor(data, target_key = "cursorType", target_value = "Bottom"):
     results = []
@@ -82,7 +86,6 @@ def convert_twitter_to_x(url):
     else:
         return "URL không hợp lệ"
     
-
 
 def fetch_links_from_acc(list_acc_check, list_user, use_proxy = False):
 
@@ -157,7 +160,8 @@ def fetch_links_from_acc(list_acc_check, list_user, use_proxy = False):
         }
         cursor_bottom = None
         time_scroll = 0
-        while time_scroll < maximum_scroll:
+        total_link_per_user = []
+        while time_scroll < maximum_scroll and len(total_link_per_user) < number_of_links:
             time_scroll += 1
             headers = {
                 "Content-Type": "application/json",
@@ -203,10 +207,9 @@ def fetch_links_from_acc(list_acc_check, list_user, use_proxy = False):
                                 url_clean = convert_twitter_to_x(image_url)
                                 if url_clean not in links:
                                     links.append(url_clean)
-                                    write_to_file(name_file_acc_st_has_favorite,url_clean)
-                                    print(f"User: {parts[3]} có seacrh top  - {favorite_count} tim - {url_clean}")
+                                    content = f"{url_clean}|{favorite_count}"
+                                    total_link_per_user.append(content)
                                     time_scroll = maximum_scroll
-                                    break
                 try:
                     cursor_bottom = find_objects_with_cursor(response.json())[0]["value"]
                 except:
@@ -230,6 +233,10 @@ def fetch_links_from_acc(list_acc_check, list_user, use_proxy = False):
             i = i + 1
         
         print(f"Đã check xong user {user}")
+        content = f"{user}\n{'\n'.join(total_link_per_user)}"
+        write_to_file(name_file_acc_st_has_favorite, content)
+        write_to_file(name_file_acc_st_has_favorite, "===============================================")
+        print(f"User: {user} có seacrh top  - có {total_link_per_user} lên top.")
         print("===============================================")
         time.sleep(time_sleep)
 
