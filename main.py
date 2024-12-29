@@ -236,7 +236,7 @@ def fetch_links_from_acc(list_acc_check, list_user, use_proxy = False):
         content = f"{user}\n{'\n'.join(total_link_per_user)}"
         write_to_file(name_file_acc_st_has_favorite, content)
         write_to_file(name_file_acc_st_has_favorite, "===============================================")
-        print(f"User: {user} có seacrh top  - có {total_link_per_user} lên top.")
+        print(f"User: {user} có seacrh top  - có {len(total_link_per_user)} link lên top.")
         print("===============================================")
         time.sleep(time_sleep)
 
