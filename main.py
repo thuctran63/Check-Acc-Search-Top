@@ -218,10 +218,8 @@ def fetch_links_from_acc(list_acc_check, list_user, use_proxy = False):
                 time.sleep(time_sleep)
             else:
                 print(f"Lỗi ck, đang chuyển sang acc khác...")
-                # xóa acc đang lỗi khỏi file acc_check.json
                 delete_acc_check(acc_check)
                 list_acc_check.remove(acc_check)
-                # chọn ngẫu nhiên 1 acc khác
                 acc_check = random.choice(list_acc_check)
                 cursor_bottom = None
                 time_scroll = 0
@@ -233,9 +231,8 @@ def fetch_links_from_acc(list_acc_check, list_user, use_proxy = False):
             i = i + 1
         
         print(f"Đã check xong user {user}")
-        content = f"{user}\n{'\n'.join(total_link_per_user)}"
+        content = f"{'\n'.join(total_link_per_user)}"
         write_to_file(name_file_acc_st_has_favorite, content)
-        write_to_file(name_file_acc_st_has_favorite, "===============================================")
         print(f"User: {user} có seacrh top  - có {len(total_link_per_user)} link lên top.")
         print("===============================================")
         time.sleep(time_sleep)
