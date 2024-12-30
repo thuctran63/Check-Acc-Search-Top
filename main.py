@@ -231,8 +231,9 @@ def fetch_links_from_acc(list_acc_check, list_user, use_proxy = False):
             i = i + 1
         
         print(f"Đã check xong user {user}")
-        content = f"{'\n'.join(total_link_per_user)}"
-        write_to_file(name_file_acc_st_has_favorite, content)
+        if len(total_link_per_user) > 0:
+            content = f"{'\n'.join(total_link_per_user)}"
+            write_to_file(name_file_acc_st_has_favorite, content)
         print(f"User: {user} có seacrh top  - có {len(total_link_per_user)} link lên top.")
         print("===============================================")
         time.sleep(time_sleep)
