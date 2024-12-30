@@ -207,7 +207,7 @@ def fetch_links_from_acc(list_acc_check, list_user, use_proxy = False):
                                 url_clean = convert_twitter_to_x(image_url)
                                 if url_clean not in links:
                                     links.append(url_clean)
-                                    content = f"{url_clean}|{favorite_count}"
+                                    content = f"{url_clean}"
                                     total_link_per_user.append(content)
                                     time_scroll = maximum_scroll
                 try:
